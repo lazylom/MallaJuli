@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malla Curricular Interactiva</title>
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="print-styles.css" media="print">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                <i class="fas fa-flask"></i>
+                Malla Curricular - Química
+            </h1>
+            <p class="subtitle">Explora el plan de estudios de Química de manera visual e interactiva</p>
+            
+            <div class="controls">
+                <div class="filter-section">
+                    <label for="semesterFilter">Filtrar por semestre:</label>
+                    <select id="semesterFilter">
+                        <option value="all">Todos los semestres</option>
+                        <option value="1">1° Semestre</option>
+                        <option value="2">2° Semestre</option>
+                        <option value="3">3° Semestre</option>
+                        <option value="4">4° Semestre</option>
+                        <option value="5">5° Semestre</option>
+                        <option value="6">6° Semestre</option>
+                        <option value="7">7° Semestre</option>
+                        <option value="8">8° Semestre</option>
+                        <option value="9">9° Semestre</option>
+                        <option value="10">10° Semestre</option>
+                    </select>
+                </div>
+                
+                <div class="search-section">
+                    <input type="text" id="searchInput" placeholder="Buscar materia...">
+                    <i class="fas fa-search"></i>
+                </div>
+                
+                <div class="control-buttons">
+                    <button id="resetBtn" class="control-btn reset-btn" title="Reiniciar progreso">
+                        <i class="fas fa-undo"></i> Reiniciar
+                    </button>
+                    <button id="exportBtn" class="control-btn export-btn" title="Exportar progreso">
+                        <i class="fas fa-download"></i> Exportar
+                    </button>
+                    <button id="importBtn" class="control-btn import-btn" title="Importar progreso">
+                        <i class="fas fa-upload"></i> Importar
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </header>
+
+        <div class="legend">
+            <div class="legend-row">
+                <div class="legend-item">
+                    <div class="legend-color basic"></div>
+                    <span>Ciencias Básicas</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color professional"></div>
+                    <span>Química Fundamental</span>
+                </div>
+            </div>
+            <div class="legend-row">
+                <div class="legend-item">
+                    <div class="legend-color specialization"></div>
+                    <span>Especialización</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color elective"></div>
+                    <span>Práctica Profesional</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-legend">
+            <div class="status-item">
+                <div class="status-indicator completed"></div>
+                <span>Completada ✓</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator available"></div>
+                <span>Disponible</span>
+            </div>
+            <div class="status-item">
+                <div class="status-indicator blocked"></div>
+                <span>Bloqueada</span>
+            </div>
+            <div class="instructions">
+                <span><strong>Click:</strong> Marcar completada | <strong>Click derecho:</strong> Ver/editar detalles</span>
+            </div>
+        </div>
+
+        <div class="curriculum-grid" id="curriculumGrid">
+            <!-- Semestre 1 -->
+            <div class="semester">
+                <h2 class="semester-title">1° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject basic" data-credits="14" data-code="MAT01" data-prereq="">
+                        <h3>Matemática 01</h3>
+                        <p class="credits">14 créditos</p>
+                        <p class="code">MAT01</p>
+                    </div>
+                    <div class="subject professional" data-credits="7" data-code="QGI" data-prereq="">
+                        <h3>Química General I</h3>
+                        <p class="credits">7 créditos</p>
+                        <p class="code">QG I</p>
+                    </div>
+                    <div class="subject basic" data-credits="5" data-code="CBI" data-prereq="">
+                        <h3>Introducción a las Ciencias Biológicas I</h3>
+                        <p class="credits">5 créditos</p>
+                        <p class="code">CB I</p>
+                    </div>
+                    <div class="subject basic" data-credits="4" data-code="PRL" data-prereq="">
+                        <h3>Prevención de Riesgos en el Laboratorio (2° hemisemestre)</h3>
+                        <p class="credits">4 créditos</p>
+                        <p class="code">PRL</p>
+                    </div>
+                    <div class="subject basic" data-credits="7" data-code="FIS101" data-prereq="">
+                        <h3>Física 101</h3>
+                        <p class="credits">7 créditos</p>
+                        <p class="code">FIS 101</p>
+                    </div>
+                    <div class="subject basic" data-credits="7" data-code="MAT03" data-prereq="MAT01">
+                        <h3>Matemática 03</h3>
+                        <p class="credits">7 créditos</p>
+                        <p class="code">MAT03</p>
+                        <p class="prereq">Pre: MAT01</p>
+                    </div>
+                    <div class="subject basic" data-credits="7" data-code="ECO" data-prereq="">
+                        <h3>Economía</h3>
+                        <p class="credits">7 créditos</p>
+                        <p class="code">ECO</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 2 -->
+            <div class="semester">
+                <h2 class="semester-title">2° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject basic" data-credits="17" data-code="MAT04" data-prereq="MAT01">
+                        <h3>Matemática 04</h3>
+                        <p class="credits">17 créditos</p>
+                        <p class="code">MAT04</p>
+                        <p class="prereq">Pre: MAT01</p>
+                    </div>
+                    <div class="subject professional" data-credits="8" data-code="QGII" data-prereq="QGI">
+                        <h3>Química General II</h3>
+                        <p class="credits">8 créditos</p>
+                        <p class="code">QG II</p>
+                        <p class="prereq">Pre: QG I</p>
+                    </div>
+                    <div class="subject basic" data-credits="5" data-code="CBII" data-prereq="CBI">
+                        <h3>Introducción a las Ciencias Biológicas II</h3>
+                        <p class="credits">5 créditos</p>
+                        <p class="code">CB II</p>
+                        <p class="prereq">Pre: CB I</p>
+                    </div>
+                    <div class="subject basic" data-credits="4" data-code="PRL2" data-prereq="">
+                        <h3>Prevención de Riesgos en el Laboratorio (1° hemisemestre)</h3>
+                        <p class="credits">4 créditos</p>
+                        <p class="code">PRL</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 3 -->
+            <div class="semester">
+                <h2 class="semester-title">3° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject professional" data-credits="11" data-code="QO101" data-prereq="QGI">
+                        <h3>Química Orgánica 101</h3>
+                        <p class="credits">11 créditos</p>
+                        <p class="code">QO 101</p>
+                        <p class="prereq">Pre: QG I</p>
+                    </div>
+                    <div class="subject professional" data-credits="10" data-code="QA1" data-prereq="QGI">
+                        <h3>Química Analítica 1</h3>
+                        <p class="credits">10 créditos</p>
+                        <p class="code">QA 1</p>
+                        <p class="prereq">Pre: QG I</p>
+                    </div>
+                    <div class="subject professional" data-credits="6" data-code="QIT" data-prereq="QGI">
+                        <h3>Química Inorgánica (T)</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">QI T</p>
+                        <p class="prereq">Pre: QG I</p>
+                    </div>
+                    <div class="subject professional" data-credits="13" data-code="FQ101" data-prereq="QGI">
+                        <h3>Fisicoquímica 101</h3>
+                        <p class="credits">13 créditos</p>
+                        <p class="code">FQ 101</p>
+                        <p class="prereq">Pre: QG I</p>
+                    </div>
+                    <div class="subject professional" data-credits="5" data-code="LQI" data-prereq="QIT">
+                        <h3>Laboratorio de Química Inorgánica</h3>
+                        <p class="credits">5 créditos</p>
+                        <p class="code">LQI</p>
+                        <p class="prereq">Pre: QI T</p>
+                    </div>
+                    <div class="subject basic" data-credits="8" data-code="FIS103" data-prereq="FIS101">
+                        <h3>Física 103</h3>
+                        <p class="credits">8 créditos</p>
+                        <p class="code">FIS 103</p>
+                        <p class="prereq">Pre: FIS 101</p>
+                    </div>
+                    <div class="subject professional" data-credits="6" data-code="FQMB" data-prereq="FQ101">
+                        <h3>Fisicoquímica Molecular Básica</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">FQMB</p>
+                        <p class="prereq">Pre: FQ 101</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 4 -->
+            <div class="semester">
+                <h2 class="semester-title">4° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject professional" data-credits="6" data-code="QO102" data-prereq="QO101">
+                        <h3>Química Orgánica 102</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">QO 102</p>
+                        <p class="prereq">Pre: QO 101</p>
+                    </div>
+                    <div class="subject professional" data-credits="10" data-code="QA2" data-prereq="QA1">
+                        <h3>Química Analítica 2</h3>
+                        <p class="credits">10 créditos</p>
+                        <p class="code">QA 2</p>
+                        <p class="prereq">Pre: QA 1</p>
+                    </div>
+                    <div class="subject basic" data-credits="7" data-code="FIS102" data-prereq="FIS101">
+                        <h3>Física 102</h3>
+                        <p class="credits">7 créditos</p>
+                        <p class="code">FIS 102</p>
+                        <p class="prereq">Pre: FIS 101</p>
+                    </div>
+                    <div class="subject basic" data-credits="11" data-code="MAT05" data-prereq="MAT03">
+                        <h3>Matemática 05</h3>
+                        <p class="credits">11 créditos</p>
+                        <p class="code">MAT05</p>
+                        <p class="prereq">Pre: MAT03</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 5 -->
+            <div class="semester">
+                <h2 class="semester-title">5° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject professional" data-credits="5" data-code="QO103L" data-prereq="QO102">
+                        <h3>Química Orgánica 103 (Laboratorio)</h3>
+                        <p class="credits">5 créditos</p>
+                        <p class="code">QO 103L</p>
+                        <p class="prereq">Pre: QO 102</p>
+                    </div>
+                    <div class="subject basic" data-credits="6" data-code="BJEMP" data-prereq="">
+                        <h3>Bases Jurídicas de la Empresa</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">BJEMP</p>
+                    </div>
+                    <div class="subject professional" data-credits="4" data-code="QO104" data-prereq="QO102">
+                        <h3>Química Orgánica 104 (1er hemisemestre)</h3>
+                        <p class="credits">4 créditos</p>
+                        <p class="code">QO 104</p>
+                        <p class="prereq">Pre: QO 102</p>
+                    </div>
+                    <div class="subject professional" data-credits="6" data-code="LAQO" data-prereq="QO103L">
+                        <h3>Laboratorio Avanzado de Química Orgánica</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">LAQO</p>
+                        <p class="prereq">Pre: QO 103L</p>
+                    </div>
+                    <div class="subject professional" data-credits="10" data-code="QA3" data-prereq="QA2">
+                        <h3>Química Analítica 3</h3>
+                        <p class="credits">10 créditos</p>
+                        <p class="code">QA 3</p>
+                        <p class="prereq">Pre: QA 2</p>
+                    </div>
+                    <div class="subject professional" data-credits="7" data-code="FQ104" data-prereq="FQ103">
+                        <h3>Fisicoquímica 104</h3>
+                        <p class="credits">7 créditos</p>
+                        <p class="code">FQ 104</p>
+                        <p class="prereq">Pre: FQ 103</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 6 -->
+            <div class="semester">
+                <h2 class="semester-title">6° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject professional" data-credits="12" data-code="FQ103" data-prereq="FQ101">
+                        <h3>Fisicoquímica 103</h3>
+                        <p class="credits">12 créditos</p>
+                        <p class="code">FQ 103</p>
+                        <p class="prereq">Pre: FQ 101</p>
+                    </div>
+                    <div class="subject basic" data-credits="6" data-code="MBG" data-prereq="CBII">
+                        <h3>Microbiología General (T)</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">MBG</p>
+                        <p class="prereq">Pre: CB II</p>
+                    </div>
+                    <div class="subject specialization" data-credits="10" data-code="BIOQ" data-prereq="QO102">
+                        <h3>Bioquímica (Opción II)</h3>
+                        <p class="credits">10 créditos</p>
+                        <p class="code">BIOQ</p>
+                        <p class="prereq">Pre: QO 102</p>
+                    </div>
+                    <div class="subject professional" data-credits="6" data-code="LAM" data-prereq="MBG">
+                        <h3>Laboratorio de Análisis Microbiológico</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">LAM</p>
+                        <p class="prereq">Pre: MBG</p>
+                    </div>
+                    <div class="subject specialization" data-credits="5" data-code="LBIOQ" data-prereq="BIOQ">
+                        <h3>Laboratorio de Bioquímica</h3>
+                        <p class="credits">5 créditos</p>
+                        <p class="code">LBIOQ</p>
+                        <p class="prereq">Pre: BIOQ</p>
+                    </div>
+                    <div class="subject specialization" data-credits="9" data-code="FARM" data-prereq="BOT">
+                        <h3>Farmacognosia</h3>
+                        <p class="credits">9 créditos</p>
+                        <p class="code">FARM</p>
+                        <p class="prereq">Pre: BOT</p>
+                    </div>
+                    <div class="subject basic" data-credits="4" data-code="BOT" data-prereq="CBI">
+                        <h3>Botánica (1er hemisemestre)</h3>
+                        <p class="credits">4 créditos</p>
+                        <p class="code">BOT</p>
+                        <p class="prereq">Pre: CB I</p>
+                    </div>
+                    <div class="subject basic" data-credits="4" data-code="UCAC" data-prereq="">
+                        <h3>UC Área Calidad</h3>
+                        <p class="credits">4 créditos</p>
+                        <p class="code">UC-AC</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 7 -->
+            <div class="semester">
+                <h2 class="semester-title">7° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject professional" data-credits="6" data-code="METSEP" data-prereq="">
+                        <h3>Métodos Separativos</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">MET-SEP</p>
+                    </div>
+                    <div class="subject specialization" data-credits="4" data-code="AGQI" data-prereq="QO101">
+                        <h3>Agroquímicos I</h3>
+                        <p class="credits">4 créditos</p>
+                        <p class="code">AGQ I</p>
+                        <p class="prereq">Pre: QO 101</p>
+                    </div>
+                    <div class="subject specialization" data-credits="5" data-code="QPN" data-prereq="QO101">
+                        <h3>Química de los Productos Naturales</h3>
+                        <p class="credits">5 créditos</p>
+                        <p class="code">QPN</p>
+                        <p class="prereq">Pre: QO 101</p>
+                    </div>
+                    <div class="subject specialization" data-credits="6" data-code="IMA" data-prereq="MBG">
+                        <h3>Introducción a la Microbiología Ambiental y Agrícola</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">IMA</p>
+                        <p class="prereq">Pre: MBG</p>
+                    </div>
+                    <div class="subject specialization" data-credits="6" data-code="ECOL" data-prereq="">
+                        <h3>Ecología Química</h3>
+                        <p class="credits">6 créditos</p>
+                        <p class="code">ECOL</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 8 -->
+            <div class="semester">
+                <h2 class="semester-title">8° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject basic" data-credits="10" data-code="AGOI" data-prereq="">
+                        <h3>Administración y Gestión de las Organizaciones I</h3>
+                        <p class="credits">10 créditos</p>
+                        <p class="code">AGO I</p>
+                    </div>
+                    <div class="subject specialization" data-credits="4" data-code="AGQI2" data-prereq="QO101">
+                        <h3>Agroquímicos I</h3>
+                        <p class="credits">4 créditos</p>
+                        <p class="code">AGQ I</p>
+                        <p class="prereq">Pre: QO 101</p>
+                    </div>
+                    <div class="subject specialization" data-credits="8" data-code="QAMB" data-prereq="">
+                        <h3>Química Ambiental</h3>
+                        <p class="credits">8 créditos</p>
+                        <p class="code">QAmb</p>
+                    </div>
+                    <div class="subject basic" data-credits="10" data-code="AGOII" data-prereq="AGOI">
+                        <h3>Administración y Gestión de las Organizaciones II</h3>
+                        <p class="credits">10 créditos</p>
+                        <p class="code">AGO II</p>
+                        <p class="prereq">Pre: AGO I</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 9 -->
+            <div class="semester">
+                <h2 class="semester-title">9° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject specialization" data-credits="5" data-code="EVALSG" data-prereq="">
+                        <h3>Evaluación de la conformidad – Auditorías de Sistemas de Gestión</h3>
+                        <p class="credits">5 créditos</p>
+                        <p class="code">EVAL-SG</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 10 -->
+            <div class="semester">
+                <h2 class="semester-title">10° Semestre</h2>
+                <div class="subjects">
+                    <div class="subject elective" data-credits="55" data-code="PRAC" data-prereq="">
+                        <h3>Practicantado</h3>
+                        <p class="credits">55 créditos</p>
+                        <p class="code">PRAC</p>
+                        <p class="prereq">Se cursa al finalizar la carrera</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para detalles de materia -->
+        <div id="subjectModal" class="modal">
+            <!-- El contenido se genera dinámicamente -->
+        </div>
+
+        <footer class="footer">
+            <div class="stats">
+                <div class="stat-item">
+                    <strong>Progreso:</strong> <span id="visibleSubjects">0</span>
+                </div>
+                <div class="stat-item">
+                    <strong>Créditos:</strong> <span id="totalCredits">0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

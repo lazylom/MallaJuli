@@ -1,0 +1,49 @@
+{
+  "name": "malla-curricular-quimica",
+  "version": "1.0.0",
+  "description": "Malla curricular interactiva para el programa de Química de 10 semestres",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "dev-node": "npx serve .",
+    "build": "echo 'No build process needed - static files'",
+    "deploy": "echo 'Deploy to GitHub Pages'",
+    "validate": "echo 'Validating HTML, CSS, and JS files'"
+  },
+  "keywords": [
+    "chemistry",
+    "química",
+    "curriculum",
+    "malla-curricular",
+    "education",
+    "interactive",
+    "web",
+    "university",
+    "academic",
+    "responsive",
+    "javascript",
+    "css",
+    "html",
+    "fisicoquimica",
+    "quimica-organica",
+    "quimica-analitica"
+  ],
+  "author": "Lucas Lombardo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lucaslombardo/malla-curricular-quimica.git"
+  },
+  "homepage": "https://lucaslombardo.github.io/malla-curricular-quimica/",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
