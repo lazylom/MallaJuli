@@ -1106,14 +1106,26 @@ function removeEditEventListeners() {
         }
     });
     
-    // Actualizar referencia y SOLO agregar eventos normales
+    // Actualizar referencia y configurar eventos normales como en el original
     allSubjects = Array.from(document.querySelectorAll('.subject'));
     
-    // Configurar SOLO eventos normales (sin eventos de edición)
+    // Configurar eventos normales exactamente como en loadSubjects()
     allSubjects.forEach(subject => {
-        subject.addEventListener('click', function() {
-            showSubjectDetails(this.getAttribute('data-code'));
+        // Click derecho para mostrar detalles (modal)
+        subject.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showSubjectDetails(subject);
         });
+        
+        // Click izquierdo para marcar/desmarcar como completada
+        subject.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSubjectCompletion(subject);
+        });
+        
+        // Hover para resaltar prerrequisitos
+        subject.addEventListener('mouseenter', () => highlightPrerequisites(subject));
+        subject.addEventListener('mouseleave', () => clearHighlights());
     });
     
     // Asegurar que los estados se actualicen correctamente
@@ -1488,7 +1500,7 @@ function updateAllSubjects() {
         });
         allSubjects = Array.from(document.querySelectorAll('.subject'));
     } else {
-        // Solo eventos normales
+        // Restaurar eventos normales completos
         removeEditEventListeners();
     }
     
