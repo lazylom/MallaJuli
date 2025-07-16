@@ -1070,11 +1070,11 @@ function toggleEditMode() {
 // Agregar eventos de edición a materias
 function addEditEventListeners() {
     allSubjects.forEach(subject => {
-        // Remover eventos existentes y agregar eventos de edición
+        // Clonar elemento para limpiar eventos
         const newSubject = subject.cloneNode(true);
         subject.parentNode.replaceChild(newSubject, subject);
         
-        // Agregar evento de edición
+        // SOLO agregar evento de edición, sin eventos normales
         newSubject.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1094,7 +1094,7 @@ function addEditEventListeners() {
 
 // Remover eventos de edición
 function removeEditEventListeners() {
-    // Recrear elementos para remover eventos de edición y restaurar los normales
+    // Recrear elementos para limpiar TODOS los eventos
     allSubjects.forEach(subject => {
         const newSubject = subject.cloneNode(true);
         subject.parentNode.replaceChild(newSubject, subject);
@@ -1106,9 +1106,15 @@ function removeEditEventListeners() {
         }
     });
     
-    // Actualizar referencia y recargar eventos normales
+    // Actualizar referencia y SOLO agregar eventos normales
     allSubjects = Array.from(document.querySelectorAll('.subject'));
-    loadSubjects();
+    
+    // Configurar SOLO eventos normales (sin eventos de edición)
+    allSubjects.forEach(subject => {
+        subject.addEventListener('click', function() {
+            showSubjectDetails(this.getAttribute('data-code'));
+        });
+    });
     
     // Asegurar que los estados se actualicen correctamente
     updatePrerequisitesStatus();
@@ -1459,11 +1465,30 @@ function recreateCurriculum() {
 function updateAllSubjects() {
     allSubjects = Array.from(document.querySelectorAll('.subject'));
     
-    // Reconfigurar eventos según el modo actual
+    // Configurar eventos según el modo actual SIN duplicar
     if (isEditMode) {
-        addEditEventListeners();
+        // Solo eventos de edición
+        allSubjects.forEach(subject => {
+            // Limpiar eventos existentes
+            const newSubject = subject.cloneNode(true);
+            subject.parentNode.replaceChild(newSubject, subject);
+            
+            // Solo evento de edición
+            newSubject.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                showEditSubjectModal(newSubject);
+            });
+            
+            // Mantener estado visual
+            const code = newSubject.getAttribute('data-code');
+            if (completedSubjects.has(code)) {
+                newSubject.classList.add('completed');
+            }
+        });
+        allSubjects = Array.from(document.querySelectorAll('.subject'));
     } else {
-        // Asegurar que se reestablezcan los eventos normales
+        // Solo eventos normales
         removeEditEventListeners();
     }
     
