@@ -1061,10 +1061,54 @@ function toggleEditMode() {
         editBtn.title = 'Activar modo edición';
         addBtn.style.display = 'none';
         
-        // Remover eventos de edición
-        removeEditEventListeners();
+        // Forzar restablecimiento completo de eventos normales
+        forceRestoreNormalEvents();
         showNotification('Modo vista activado', 'info');
     }
+}
+
+// Función para forzar el restablecimiento de eventos normales
+function forceRestoreNormalEvents() {
+    // Limpiar completamente todos los eventos y recrear como en el sistema original
+    allSubjects = Array.from(document.querySelectorAll('.subject'));
+    
+    allSubjects.forEach(subject => {
+        // Clonar elemento para eliminar todos los eventos
+        const newSubject = subject.cloneNode(true);
+        subject.parentNode.replaceChild(newSubject, subject);
+        
+        // Restaurar estado completado si corresponde
+        const code = newSubject.getAttribute('data-code');
+        if (completedSubjects.has(code)) {
+            newSubject.classList.add('completed');
+        }
+    });
+    
+    // Actualizar referencia y aplicar eventos normales
+    allSubjects = Array.from(document.querySelectorAll('.subject'));
+    
+    // Aplicar exactamente los mismos eventos que en loadSubjects()
+    allSubjects.forEach(subject => {
+        // Click derecho para mostrar detalles (modal)
+        subject.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showSubjectDetails(subject);
+        });
+        
+        // Click izquierdo para marcar/desmarcar como completada
+        subject.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSubjectCompletion(subject);
+        });
+        
+        // Hover para resaltar prerrequisitos
+        subject.addEventListener('mouseenter', () => highlightPrerequisites(subject));
+        subject.addEventListener('mouseleave', () => clearHighlights());
+    });
+    
+    // Actualizar estados
+    updatePrerequisitesStatus();
+    updateStats();
 }
 
 // Agregar eventos de edición a materias
@@ -1094,6 +1138,9 @@ function addEditEventListeners() {
 
 // Remover eventos de edición
 function removeEditEventListeners() {
+    // Actualizar referencia a todos los elementos actuales
+    allSubjects = Array.from(document.querySelectorAll('.subject'));
+    
     // Recrear elementos para limpiar TODOS los eventos
     allSubjects.forEach(subject => {
         const newSubject = subject.cloneNode(true);
@@ -1106,7 +1153,7 @@ function removeEditEventListeners() {
         }
     });
     
-    // Actualizar referencia y configurar eventos normales como en el original
+    // Volver a obtener la referencia después del reemplazo
     allSubjects = Array.from(document.querySelectorAll('.subject'));
     
     // Configurar eventos normales exactamente como en loadSubjects()
