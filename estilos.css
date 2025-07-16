@@ -385,37 +385,108 @@ body {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
+    overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .modal-content {
     background-color: var(--card-bg);
-    margin: 5% auto;
-    padding: 30px;
+    margin: 0 auto;
+    padding: 0;
     border-radius: var(--border-radius);
-    width: 90%;
-    max-width: 600px;
+    width: 100%;
+    max-width: 700px;
+    max-height: calc(100vh - 40px);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     position: relative;
     animation: modalSlideIn 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Centrar verticalmente */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-@keyframes modalSlideIn {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.modal-header {
+    padding: 20px 30px 15px 30px;
+    border-bottom: 2px solid var(--border-color);
+    flex-shrink: 0;
+    background: var(--card-bg);
+    position: relative;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.modal-body {
+    padding: 20px 30px 30px 30px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    scroll-behavior: smooth;
+    max-height: calc(100vh - 160px);
+    background-color: var(--card-bg);
+}
+
+.modal-body:focus {
+    outline: none;
+}
+
+/* Personalizar scrollbar del modal */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
 }
 
 .close {
     color: var(--text-secondary);
-    float: right;
+    position: absolute;
+    top: 15px;
+    right: 20px;
     font-size: 28px;
     font-weight: bold;
     cursor: pointer;
     transition: var(--transition);
+    z-index: 10;
 }
 
 .close:hover {
     color: var(--accent-color);
     transform: scale(1.1);
+}
+
+#modalTitle {
+    margin: 0;
+    padding-right: 50px; /* Espacio para el botón cerrar */
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
 }
 
 /* Footer con estadísticas */
@@ -479,59 +550,62 @@ body {
         flex-direction: column;
         gap: 15px;
     }
-}
-
-/* Efectos adicionales */
-.subject:active {
-    transform: scale(0.98);
-}
-
-.semester:hover .semester-title {
-    color: var(--secondary-color);
-    transform: scale(1.05);
-}
-
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-color);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--secondary-color);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-color);
-}
-
-/* Animaciones de carga */
-.semester {
-    animation: slideInUp 0.6s ease-out;
-    animation-fill-mode: both;
-}
-
-.semester:nth-child(1) { animation-delay: 0.1s; }
-.semester:nth-child(2) { animation-delay: 0.2s; }
-.semester:nth-child(3) { animation-delay: 0.3s; }
-.semester:nth-child(4) { animation-delay: 0.4s; }
-.semester:nth-child(5) { animation-delay: 0.5s; }
-.semester:nth-child(6) { animation-delay: 0.6s; }
-.semester:nth-child(7) { animation-delay: 0.7s; }
-.semester:nth-child(8) { animation-delay: 0.8s; }
-
-@keyframes slideInUp {
-    from {
-        transform: translateY(30px);
-        opacity: 0;
+    
+    .modal-content {
+        width: 95%;
+        max-height: 85vh;
+        margin: 5% auto;
     }
-    to {
-        transform: translateY(0);
-        opacity: 1;
+    
+    .modal-header {
+        padding: 15px 20px 10px 20px;
+    }
+    
+    .modal-body {
+        padding: 15px 20px 20px 20px;
+        max-height: calc(85vh - 70px);
+    }
+    
+    #modalTitle {
+        font-size: 1.3rem;
+        padding-right: 40px;
+    }
+    
+    .close {
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        margin: 3px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        width: 98%;
+        max-height: 90vh;
+        margin: 2% auto;
+    }
+    
+    .modal-header {
+        padding: 12px 15px 8px 15px;
+    }
+    
+    .modal-body {
+        padding: 12px 15px 15px 15px;
+        max-height: calc(90vh - 60px);
+    }
+    
+    #modalTitle {
+        font-size: 1.2rem;
+        line-height: 1.3;
     }
 }
 
@@ -751,11 +825,39 @@ body {
         text-align: center;
     }
     
-    .instructions {
-        margin-left: 0;
-        padding-left: 0;
-        border-left: none;
-        padding-top: 10px;
-        border-top: 1px solid var(--border-color);
+    /* Modal responsive */
+    .modal {
+        padding: 10px;
+    }
+    
+    .modal-content {
+        width: calc(100% - 20px);
+        max-height: calc(100vh - 20px);
+        margin: 10px;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        transform: none;
+        border-radius: 10px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px 10px 20px;
+    }
+    
+    .modal-body {
+        padding: 15px 20px 20px 20px;
+        max-height: calc(100vh - 120px);
+    }
+    
+    #modalTitle {
+        font-size: 1.2rem;
+        padding-right: 40px;
+    }
+    
+    .close {
+        font-size: 24px;
+        top: 10px;
+        right: 15px;
     }
 }

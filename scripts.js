@@ -126,7 +126,6 @@ function initializeApp() {
     setupEventListeners();
     setupControlButtons(); // Configurar botones de control
     updateStats();
-    setupModal();
     updatePrerequisitesStatus();
     setupControlButtons();
 }
@@ -253,103 +252,148 @@ function showSubjectDetails(subject) {
         schedule: ''
     };
     
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
+    const modal = document.getElementById('subjectModal');
     
-    modalTitle.textContent = details.name;
-    
-    modalBody.innerHTML = `
-        <div class="modal-info">
-            <div class="modal-actions">
-                <button id="editBtn" class="btn btn-primary">✏️ Editar Información</button>
-                <button id="saveBtn" class="btn btn-success" style="display: none;">💾 Guardar</button>
-                <button id="cancelBtn" class="btn btn-secondary" style="display: none;">❌ Cancelar</button>
-            </div>
-            
-            <div class="info-section">
-                <h3><i class="fas fa-info-circle"></i> Información General</h3>
-                <p><strong>Código:</strong> ${code}</p>
-                <p><strong>Créditos:</strong> ${credits}</p>
-                <p><strong>Categoría:</strong> ${category}</p>
-                <p><strong>Prerrequisitos:</strong> ${prereq || 'Ninguno'}</p>
-                <p><strong>Estado:</strong> ${completedSubjects.has(code) ? '✅ Completada' : '⏳ Pendiente'}</p>
-            </div>
-            
-            <div class="info-section">
-                <h3><i class="fas fa-book"></i> Descripción</h3>
-                <div id="description-display">
-                    <p>${details.description}</p>
-                </div>
-                <div id="description-edit" style="display: none;">
-                    <textarea id="description-input" rows="3">${details.description}</textarea>
+    // Crear estructura del modal con header y body separados
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close">&times;</span>
+                <h2 id="modalTitle">${details.name}</h2>
+                <div class="modal-actions">
+                    <button id="editBtn" class="btn btn-primary">✏️ Editar Información</button>
+                    <button id="saveBtn" class="btn btn-success" style="display: none;">💾 Guardar</button>
+                    <button id="cancelBtn" class="btn btn-secondary" style="display: none;">❌ Cancelar</button>
                 </div>
             </div>
             
-            <div class="info-section">
-                <h3><i class="fas fa-target"></i> Objetivos</h3>
-                <div id="objectives-display">
-                    <ul>
-                        ${details.objectives.map(obj => `<li>${obj}</li>`).join('')}
-                    </ul>
+            <div class="modal-body">
+                <div class="modal-info">
+                    <div class="info-section">
+                        <h3><i class="fas fa-info-circle"></i> Información General</h3>
+                        <p><strong>Código:</strong> ${code}</p>
+                        <p><strong>Créditos:</strong> ${credits}</p>
+                        <p><strong>Categoría:</strong> ${category}</p>
+                        <p><strong>Prerrequisitos:</strong> ${prereq || 'Ninguno'}</p>
+                        <p><strong>Estado:</strong> ${completedSubjects.has(code) ? '✅ Completada' : '⏳ Pendiente'}</p>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-book"></i> Descripción</h3>
+                        <div id="description-display">
+                            <p>${details.description}</p>
+                        </div>
+                        <div id="description-edit" style="display: none;">
+                            <textarea id="description-input" rows="3">${details.description}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-target"></i> Objetivos</h3>
+                        <div id="objectives-display">
+                            <ul>
+                                ${details.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div id="objectives-edit" style="display: none;">
+                            <textarea id="objectives-input" rows="4" placeholder="Escribe cada objetivo en una línea nueva">${details.objectives.join('\n')}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-list"></i> Temas Principales</h3>
+                        <div id="topics-display">
+                            <ul>
+                                ${details.topics.map(topic => `<li>${topic}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div id="topics-edit" style="display: none;">
+                            <textarea id="topics-input" rows="4" placeholder="Escribe cada tema en una línea nueva">${details.topics.join('\n')}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-user"></i> Docente</h3>
+                        <div id="professor-display">
+                            <p>${details.professor || 'No especificado'}</p>
+                        </div>
+                        <div id="professor-edit" style="display: none;">
+                            <input type="text" id="professor-input" value="${details.professor}" placeholder="Nombre del docente">
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-clock"></i> Horario</h3>
+                        <div id="schedule-display">
+                            <p>${details.schedule || 'No especificado'}</p>
+                        </div>
+                        <div id="schedule-edit" style="display: none;">
+                            <input type="text" id="schedule-input" value="${details.schedule}" placeholder="Ejemplo: Lunes, Miércoles 8:00-10:00">
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-lightbulb"></i> Instrucciones</h3>
+                        <p><strong>Click izquierdo:</strong> Marcar como completada/pendiente</p>
+                        <p><strong>Click derecho:</strong> Ver/editar información detallada</p>
+                        <p><strong>Hover:</strong> Resaltar prerrequisitos</p>
+                    </div>
                 </div>
-                <div id="objectives-edit" style="display: none;">
-                    <textarea id="objectives-input" rows="4" placeholder="Escribe cada objetivo en una línea nueva">${details.objectives.join('\n')}</textarea>
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <h3><i class="fas fa-list"></i> Temas Principales</h3>
-                <div id="topics-display">
-                    <ul>
-                        ${details.topics.map(topic => `<li>${topic}</li>`).join('')}
-                    </ul>
-                </div>
-                <div id="topics-edit" style="display: none;">
-                    <textarea id="topics-input" rows="4" placeholder="Escribe cada tema en una línea nueva">${details.topics.join('\n')}</textarea>
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <h3><i class="fas fa-user"></i> Docente</h3>
-                <div id="professor-display">
-                    <p>${details.professor || 'No especificado'}</p>
-                </div>
-                <div id="professor-edit" style="display: none;">
-                    <input type="text" id="professor-input" value="${details.professor}" placeholder="Nombre del docente">
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <h3><i class="fas fa-clock"></i> Horario</h3>
-                <div id="schedule-display">
-                    <p>${details.schedule || 'No especificado'}</p>
-                </div>
-                <div id="schedule-edit" style="display: none;">
-                    <input type="text" id="schedule-input" value="${details.schedule}" placeholder="Ejemplo: Lunes, Miércoles 8:00-10:00">
-                </div>
-            </div>
-            
-            <div class="info-section">
-                <h3><i class="fas fa-lightbulb"></i> Instrucciones</h3>
-                <p><strong>Click izquierdo:</strong> Marcar como completada/pendiente</p>
-                <p><strong>Click derecho:</strong> Ver/editar información detallada</p>
-                <p><strong>Hover:</strong> Resaltar prerrequisitos</p>
             </div>
         </div>
     `;
     
-    // Configurar botones de edición
-    setupEditButtons(code);
+    // Configurar eventos del modal
+    setupModalEvents(code);
     
-    document.getElementById('subjectModal').style.display = 'block';
+    modal.style.display = 'block';
+    
+    // Prevenir scroll del body cuando el modal está abierto
+    document.body.style.overflow = 'hidden';
+    
+    // Enfocar el modal body para permitir scroll con teclado
+    setTimeout(() => {
+        const modalBody = modal.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.focus();
+            // Hacer scroll al inicio del contenido
+            modalBody.scrollTop = 0;
+        }
+    }, 100);
 }
 
-// Configurar botones de edición en el modal
-function setupEditButtons(code) {
-    const editBtn = document.getElementById('editBtn');
-    const saveBtn = document.getElementById('saveBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
+// Configurar eventos del modal
+function setupModalEvents(code) {
+    const modal = document.getElementById('subjectModal');
+    const closeBtn = modal.querySelector('.close');
+    const editBtn = modal.querySelector('#editBtn');
+    const saveBtn = modal.querySelector('#saveBtn');
+    const cancelBtn = modal.querySelector('#cancelBtn');
     
+    // Cerrar modal
+    const closeModal = () => {
+        modal.style.display = 'none';
+        // Restaurar scroll del body
+        document.body.style.overflow = '';
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    
+    // Cerrar al hacer click fuera del contenido
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+    
+    // Cerrar con tecla Escape
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal.style.display === 'block') {
+            closeModal();
+        }
+    });
+    
+    // Botones de edición
     editBtn.addEventListener('click', () => {
         toggleEditMode(true);
     });
@@ -361,8 +405,22 @@ function setupEditButtons(code) {
     
     cancelBtn.addEventListener('click', () => {
         toggleEditMode(false);
+        // Recargar el modal para descartar cambios
+        const subject = document.querySelector(`[data-code="${code}"]`);
+        showSubjectDetails(subject);
     });
+    
+    // Manejar tecla Escape
+    const handleEscape = (event) => {
+        if (event.key === 'Escape') {
+            modal.style.display = 'none';
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
 }
+
+// Funciones de modal ya integradas en showSubjectDetails y setupModalEvents
 
 // Alternar modo de edición
 function toggleEditMode(editing) {
@@ -437,21 +495,7 @@ function saveSubjectEdits(code) {
     showSubjectDetails(subject);
 }
 
-// Configurar modal
-function setupModal() {
-    const modal = document.getElementById('subjectModal');
-    const closeBtn = document.querySelector('.close');
-    
-    closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-    
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-}
+// setupModal ya no es necesario - integrado en setupModalEvents
 
 // Obtener nombre de categoría
 function getCategoryName(subject) {
