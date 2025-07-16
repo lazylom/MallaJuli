@@ -1070,7 +1070,7 @@ function toggleEditMode() {
 // Agregar eventos de edición a materias
 function addEditEventListeners() {
     allSubjects.forEach(subject => {
-        // Remover eventos normales temporalmente
+        // Remover eventos existentes y agregar eventos de edición
         const newSubject = subject.cloneNode(true);
         subject.parentNode.replaceChild(newSubject, subject);
         
@@ -1080,6 +1080,12 @@ function addEditEventListeners() {
             e.stopPropagation();
             showEditSubjectModal(newSubject);
         });
+        
+        // Mantener estado visual si estaba completada
+        const code = newSubject.getAttribute('data-code');
+        if (completedSubjects.has(code)) {
+            newSubject.classList.add('completed');
+        }
     });
     
     // Actualizar referencia a allSubjects
@@ -1088,8 +1094,25 @@ function addEditEventListeners() {
 
 // Remover eventos de edición
 function removeEditEventListeners() {
-    // Recargar eventos normales
+    // Recrear elementos para remover eventos de edición y restaurar los normales
+    allSubjects.forEach(subject => {
+        const newSubject = subject.cloneNode(true);
+        subject.parentNode.replaceChild(newSubject, subject);
+        
+        // Restaurar estado visual si estaba completada
+        const code = newSubject.getAttribute('data-code');
+        if (completedSubjects.has(code)) {
+            newSubject.classList.add('completed');
+        }
+    });
+    
+    // Actualizar referencia y recargar eventos normales
+    allSubjects = Array.from(document.querySelectorAll('.subject'));
     loadSubjects();
+    
+    // Asegurar que los estados se actualicen correctamente
+    updatePrerequisitesStatus();
+    updateStats();
 }
 
 // Configurar modal de edición de materias
@@ -1440,7 +1463,8 @@ function updateAllSubjects() {
     if (isEditMode) {
         addEditEventListeners();
     } else {
-        loadSubjects();
+        // Asegurar que se reestablezcan los eventos normales
+        removeEditEventListeners();
     }
     
     // Actualizar estados
