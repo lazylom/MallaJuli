@@ -170,6 +170,40 @@ body {
 .legend-color.specialization { background-color: var(--specialization-color); }
 .legend-color.elective { background-color: var(--elective-color); }
 
+/* Estilos para botones de control */
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    padding: 10px 15px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.control-btn i {
+    font-size: 0.8rem;
+}
+
 /* Grid de curriculum */
 .curriculum-grid {
     display: grid;
@@ -283,8 +317,26 @@ body {
 
 /* Estados especiales */
 .subject.completed {
-    background: linear-gradient(135deg, #d4edda, #c3e6cb);
-    border-color: var(--success-color);
+    background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+    border-left: 4px solid var(--success-color) !important;
+    position: relative;
+}
+
+.subject.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 .subject.in-progress {
@@ -293,13 +345,19 @@ body {
 }
 
 .subject.available {
-    background: linear-gradient(135deg, #cce5ff, #b3d9ff);
-    border-color: var(--info-color);
+    border-left: 4px solid var(--info-color) !important;
 }
 
 .subject.blocked {
     opacity: 0.6;
-    background: #f8f9fa;
+    background: #f8f9fa !important;
+    border-left: 4px solid var(--accent-color) !important;
+    cursor: not-allowed;
+}
+
+.subject.blocked:hover {
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Animaciones de filtro */
@@ -423,34 +481,6 @@ body {
     }
 }
 
-@media (max-width: 480px) {
-    .header {
-        padding: 30px 20px;
-    }
-    
-    .title {
-        font-size: 1.8rem;
-    }
-    
-    .subtitle {
-        font-size: 1rem;
-    }
-    
-    .semester {
-        padding: 20px 15px;
-    }
-    
-    .subject {
-        padding: 15px;
-    }
-    
-    .modal-content {
-        margin: 10% auto;
-        padding: 20px;
-        width: 95%;
-    }
-}
-
 /* Efectos adicionales */
 .subject:active {
     transform: scale(0.98);
@@ -502,5 +532,230 @@ body {
     to {
         transform: translateY(0);
         opacity: 1;
+    }
+}
+
+/* Estilos para el sistema de materias completadas */
+.subject.completed {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+    border-left: 4px solid var(--success-color) !important;
+    position: relative;
+}
+
+.subject.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.subject.available {
+    border-left: 4px solid var(--info-color) !important;
+}
+
+.subject.blocked {
+    opacity: 0.6;
+    background: #f8f9fa !important;
+    border-left: 4px solid var(--accent-color) !important;
+    cursor: not-allowed;
+}
+
+.subject.blocked:hover {
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Estilos para el modal de edición */
+.modal-actions {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.btn {
+    padding: 8px 16px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #229954;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: var(--text-secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #6c757d;
+    transform: translateY(-1px);
+}
+
+/* Estilos para campos de edición */
+.modal-info textarea,
+.modal-info input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    resize: vertical;
+    transition: var(--transition);
+}
+
+.modal-info textarea:focus,
+.modal-info input[type="text"]:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.modal-info textarea {
+    min-height: 80px;
+}
+
+/* Estilos para información de instrucciones */
+.info-section:last-child {
+    background: var(--bg-color);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid var(--info-color);
+}
+
+.info-section:last-child p {
+    margin: 5px 0;
+    font-size: 13px;
+}
+
+.info-section:last-child strong {
+    color: var(--primary-color);
+}
+
+/* Animaciones para cambios de estado */
+.subject {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subject:active {
+    transform: scale(0.95);
+}
+
+/* Indicador visual para materias con click derecho */
+.subject {
+    position: relative;
+}
+
+.subject::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.subject:hover::before {
+    opacity: 1;
+}
+
+/* Mejoras para el modal */
+.modal-info h3 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-info .info-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-info .info-section:last-child {
+    border-bottom: none;
+}
+
+/* Responsive para elementos de edición */
+@media (max-width: 768px) {
+    .modal-actions {
+        text-align: center;
+    }
+    
+    .btn {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    .modal-info textarea,
+    .modal-info input[type="text"] {
+        font-size: 16px; /* Evitar zoom en iOS */
+    }
+    
+    .control-buttons {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .control-btn {
+        flex: 1;
+        min-width: 100px;
+        justify-content: center;
+    }
+    
+    .status-legend {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .instructions {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: none;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-color);
     }
 }

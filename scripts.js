@@ -8,122 +8,127 @@ let allSubjects = [];
 let filteredSubjects = [];
 let currentFilter = 'all';
 let searchQuery = '';
+let completedSubjects = new Set(); // Materias completadas por el usuario
 
-// Datos detallados de las materias de Química
-const subjectDetails = {
+// Datos detallados de las materias de Química (editables por el usuario)
+let subjectDetails = {
     'MAT01': {
         name: 'Matemática 01',
         description: 'Fundamentos matemáticos esenciales para química. Cálculo diferencial e integral aplicado a problemas químicos.',
         objectives: ['Dominar cálculo diferencial e integral', 'Aplicar matemáticas a problemas químicos', 'Desarrollar pensamiento analítico'],
         topics: ['Límites y continuidad', 'Derivadas y aplicaciones', 'Integrales definidas e indefinidas', 'Series y sucesiones'],
-        professor: 'Dr. Juan Pérez',
-        schedule: 'Lunes, Miércoles, Viernes 8:00-10:00'
+        professor: '',
+        schedule: ''
     },
     'QGI': {
         name: 'Química General I',
         description: 'Introducción a los conceptos fundamentales de la química. Estructura atómica, enlaces químicos y termodinámica básica.',
         objectives: ['Comprender estructura atómica', 'Dominar conceptos de enlace químico', 'Aplicar leyes de la termodinámica'],
         topics: ['Estructura atómica', 'Tabla periódica', 'Enlaces químicos', 'Estequiometría', 'Termodinámica química'],
-        professor: 'Dra. María García',
-        schedule: 'Martes, Jueves 8:00-11:00'
+        professor: '',
+        schedule: ''
     },
     'CBI': {
         name: 'Introducción a las Ciencias Biológicas I',
         description: 'Fundamentos de biología celular y molecular aplicados a la química.',
         objectives: ['Comprender estructura celular', 'Relacionar química y biología', 'Analizar procesos bioquímicos'],
         topics: ['Biología celular', 'Biomoléculas', 'Metabolismo celular', 'Genética molecular'],
-        professor: 'Dr. Carlos Rodríguez',
-        schedule: 'Lunes, Miércoles 14:00-16:00'
+        professor: '',
+        schedule: ''
     },
     'PRL': {
         name: 'Prevención de Riesgos en el Laboratorio',
         description: 'Normas de seguridad y prevención de riesgos en laboratorios químicos.',
         objectives: ['Identificar riesgos químicos', 'Aplicar medidas preventivas', 'Manejar emergencias'],
         topics: ['Seguridad química', 'Manejo de residuos', 'Primeros auxilios', 'Normativas de seguridad'],
-        professor: 'Ing. Ana López',
-        schedule: 'Viernes 14:00-18:00'
+        professor: '',
+        schedule: ''
     },
     'FIS101': {
         name: 'Física 101',
         description: 'Mecánica clásica y termodinámica aplicada a sistemas químicos.',
         objectives: ['Comprender mecánica clásica', 'Aplicar termodinámica', 'Resolver problemas físico-químicos'],
         topics: ['Mecánica de partículas', 'Termodinámica', 'Ondas y oscilaciones', 'Fluidos'],
-        professor: 'Dr. Roberto Silva',
-        schedule: 'Martes, Jueves 14:00-16:00'
+        professor: '',
+        schedule: ''
     },
     'QO101': {
         name: 'Química Orgánica 101',
         description: 'Fundamentos de química orgánica. Estructura, nomenclatura y reactividad de compuestos orgánicos.',
         objectives: ['Dominar nomenclatura orgánica', 'Comprender mecanismos de reacción', 'Predecir reactividad química'],
         topics: ['Hidrocarburos', 'Grupos funcionales', 'Estereoquímica', 'Mecanismos de reacción'],
-        professor: 'Dra. Laura Mendoza',
-        schedule: 'Lunes, Miércoles, Viernes 10:00-12:00'
+        professor: '',
+        schedule: ''
     },
     'QA1': {
         name: 'Química Analítica 1',
         description: 'Métodos clásicos de análisis químico cuantitativo y cualitativo.',
         objectives: ['Dominar técnicas analíticas', 'Realizar análisis cuantitativos', 'Interpretar resultados analíticos'],
         topics: ['Análisis gravimétrico', 'Análisis volumétrico', 'Equilibrios químicos', 'Estadística analítica'],
-        professor: 'Dr. Fernando Castro',
-        schedule: 'Martes, Jueves 8:00-12:00'
+        professor: '',
+        schedule: ''
     },
     'FQ101': {
         name: 'Fisicoquímica 101',
         description: 'Principios físicos aplicados a sistemas químicos. Termodinámica y cinética química.',
         objectives: ['Aplicar termodinámica química', 'Estudiar cinética de reacciones', 'Comprender equilibrios físico-químicos'],
         topics: ['Termodinámica química', 'Cinética química', 'Equilibrio químico', 'Fenómenos de superficie'],
-        professor: 'Dr. Miguel Torres',
-        schedule: 'Lunes, Miércoles, Viernes 14:00-17:00'
+        professor: '',
+        schedule: ''
     },
     'BIOQ': {
         name: 'Bioquímica',
         description: 'Química de los procesos biológicos. Metabolismo y estructura de biomoléculas.',
         objectives: ['Comprender metabolismo celular', 'Analizar estructura de proteínas', 'Estudiar enzimología'],
         topics: ['Metabolismo de carbohidratos', 'Metabolismo de lípidos', 'Síntesis de proteínas', 'Regulación metabólica'],
-        professor: 'Dra. Patricia Vargas',
-        schedule: 'Martes, Jueves 10:00-13:00'
+        professor: '',
+        schedule: ''
     },
     'FARM': {
         name: 'Farmacognosia',
         description: 'Estudio de medicamentos de origen natural. Principios activos de plantas medicinales.',
         objectives: ['Identificar principios activos', 'Analizar plantas medicinales', 'Desarrollar fitomedicamentos'],
         topics: ['Metabolitos secundarios', 'Extracción de principios activos', 'Control de calidad', 'Fitoquímica'],
-        professor: 'Dra. Carmen Jiménez',
-        schedule: 'Lunes, Viernes 8:00-11:00'
+        professor: '',
+        schedule: ''
     },
     'AGQI': {
         name: 'Agroquímicos I',
         description: 'Química de pesticidas y fertilizantes. Aplicaciones en agricultura sostenible.',
         objectives: ['Comprender química de pesticidas', 'Desarrollar agroquímicos sostenibles', 'Evaluar impacto ambiental'],
         topics: ['Pesticidas orgánicos', 'Fertilizantes químicos', 'Residuos y toxicología', 'Agricultura sostenible'],
-        professor: 'Dr. Ricardo Herrera',
-        schedule: 'Miércoles, Viernes 14:00-16:00'
+        professor: '',
+        schedule: ''
     },
     'QAMB': {
         name: 'Química Ambiental',
         description: 'Procesos químicos en el medio ambiente. Contaminación y remediación.',
         objectives: ['Analizar contaminación química', 'Desarrollar métodos de remediación', 'Evaluar impacto ambiental'],
         topics: ['Contaminación atmosférica', 'Química de aguas', 'Contaminación del suelo', 'Tecnologías limpias'],
-        professor: 'Dra. Valeria Morales',
-        schedule: 'Lunes, Miércoles 16:00-18:00'
+        professor: '',
+        schedule: ''
     },
     'PRAC': {
         name: 'Practicantado',
         description: 'Práctica profesional en empresa o institución. Aplicación práctica de conocimientos adquiridos.',
         objectives: ['Aplicar conocimientos teóricos', 'Desarrollar competencias profesionales', 'Integrar saberes disciplinares'],
         topics: ['Práctica supervisada', 'Proyecto aplicado', 'Informe técnico', 'Evaluación profesional'],
-        professor: 'Coordinador de prácticas',
-        schedule: 'Tiempo completo en institución externa'
+        professor: '',
+        schedule: ''
     }
 };
 
 // Inicialización de la aplicación
 function initializeApp() {
+    loadCompletedSubjects(); // Cargar materias completadas del localStorage
+    loadSubjectDetails(); // Cargar detalles editados del localStorage
     loadSubjects();
     setupEventListeners();
+    setupControlButtons(); // Configurar botones de control
     updateStats();
     setupModal();
-    initializePrerequisites();
+    updatePrerequisitesStatus();
+    setupControlButtons();
 }
 
 // Cargar todas las materias
@@ -133,7 +138,19 @@ function loadSubjects() {
     
     // Agregar eventos de click a cada materia
     allSubjects.forEach(subject => {
-        subject.addEventListener('click', () => showSubjectDetails(subject));
+        // Click derecho para mostrar detalles (modal)
+        subject.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            showSubjectDetails(subject);
+        });
+        
+        // Click izquierdo para marcar/desmarcar como completada
+        subject.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleSubjectCompletion(subject);
+        });
+        
+        // Hover para resaltar prerrequisitos
         subject.addEventListener('mouseenter', () => highlightPrerequisites(subject));
         subject.addEventListener('mouseleave', () => clearHighlights());
     });
@@ -206,16 +223,20 @@ function filterSubjects() {
 
 // Actualizar estadísticas
 function updateStats() {
+    const stats = getProgressStats();
     const visibleSubjects = document.querySelectorAll('.subject[style="display: block"], .subject:not([style*="display: none"])');
-    const totalCredits = Array.from(visibleSubjects).reduce((sum, subject) => {
+    const visibleCredits = Array.from(visibleSubjects).reduce((sum, subject) => {
         return sum + parseInt(subject.getAttribute('data-credits') || 0);
     }, 0);
     
-    document.getElementById('totalCredits').textContent = totalCredits;
-    document.getElementById('visibleSubjects').textContent = visibleSubjects.length;
+    document.getElementById('totalCredits').textContent = `${stats.completedCredits}/${stats.totalCredits}`;
+    document.getElementById('visibleSubjects').textContent = `${stats.completedCount}/${stats.totalSubjects} (${stats.progressPercentage}%)`;
+    
+    // Actualizar título del documento con progreso
+    document.title = `Química - ${stats.progressPercentage}% completado`;
 }
 
-// Mostrar detalles de materia en modal
+// Mostrar detalles de materia en modal con opción de edición
 function showSubjectDetails(subject) {
     const code = subject.getAttribute('data-code');
     const name = subject.querySelector('h3').textContent;
@@ -228,8 +249,8 @@ function showSubjectDetails(subject) {
         description: 'Información detallada no disponible.',
         objectives: ['Información no disponible'],
         topics: ['Información no disponible'],
-        professor: 'Por asignar',
-        schedule: 'Por definir'
+        professor: '',
+        schedule: ''
     };
     
     const modalTitle = document.getElementById('modalTitle');
@@ -239,46 +260,181 @@ function showSubjectDetails(subject) {
     
     modalBody.innerHTML = `
         <div class="modal-info">
+            <div class="modal-actions">
+                <button id="editBtn" class="btn btn-primary">✏️ Editar Información</button>
+                <button id="saveBtn" class="btn btn-success" style="display: none;">💾 Guardar</button>
+                <button id="cancelBtn" class="btn btn-secondary" style="display: none;">❌ Cancelar</button>
+            </div>
+            
             <div class="info-section">
                 <h3><i class="fas fa-info-circle"></i> Información General</h3>
                 <p><strong>Código:</strong> ${code}</p>
                 <p><strong>Créditos:</strong> ${credits}</p>
                 <p><strong>Categoría:</strong> ${category}</p>
                 <p><strong>Prerrequisitos:</strong> ${prereq || 'Ninguno'}</p>
+                <p><strong>Estado:</strong> ${completedSubjects.has(code) ? '✅ Completada' : '⏳ Pendiente'}</p>
             </div>
             
             <div class="info-section">
                 <h3><i class="fas fa-book"></i> Descripción</h3>
-                <p>${details.description}</p>
+                <div id="description-display">
+                    <p>${details.description}</p>
+                </div>
+                <div id="description-edit" style="display: none;">
+                    <textarea id="description-input" rows="3">${details.description}</textarea>
+                </div>
             </div>
             
             <div class="info-section">
                 <h3><i class="fas fa-target"></i> Objetivos</h3>
-                <ul>
-                    ${details.objectives.map(obj => `<li>${obj}</li>`).join('')}
-                </ul>
+                <div id="objectives-display">
+                    <ul>
+                        ${details.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                    </ul>
+                </div>
+                <div id="objectives-edit" style="display: none;">
+                    <textarea id="objectives-input" rows="4" placeholder="Escribe cada objetivo en una línea nueva">${details.objectives.join('\n')}</textarea>
+                </div>
             </div>
             
             <div class="info-section">
                 <h3><i class="fas fa-list"></i> Temas Principales</h3>
-                <ul>
-                    ${details.topics.map(topic => `<li>${topic}</li>`).join('')}
-                </ul>
+                <div id="topics-display">
+                    <ul>
+                        ${details.topics.map(topic => `<li>${topic}</li>`).join('')}
+                    </ul>
+                </div>
+                <div id="topics-edit" style="display: none;">
+                    <textarea id="topics-input" rows="4" placeholder="Escribe cada tema en una línea nueva">${details.topics.join('\n')}</textarea>
+                </div>
             </div>
             
             <div class="info-section">
                 <h3><i class="fas fa-user"></i> Docente</h3>
-                <p>${details.professor}</p>
+                <div id="professor-display">
+                    <p>${details.professor || 'No especificado'}</p>
+                </div>
+                <div id="professor-edit" style="display: none;">
+                    <input type="text" id="professor-input" value="${details.professor}" placeholder="Nombre del docente">
+                </div>
             </div>
             
             <div class="info-section">
                 <h3><i class="fas fa-clock"></i> Horario</h3>
-                <p>${details.schedule}</p>
+                <div id="schedule-display">
+                    <p>${details.schedule || 'No especificado'}</p>
+                </div>
+                <div id="schedule-edit" style="display: none;">
+                    <input type="text" id="schedule-input" value="${details.schedule}" placeholder="Ejemplo: Lunes, Miércoles 8:00-10:00">
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h3><i class="fas fa-lightbulb"></i> Instrucciones</h3>
+                <p><strong>Click izquierdo:</strong> Marcar como completada/pendiente</p>
+                <p><strong>Click derecho:</strong> Ver/editar información detallada</p>
+                <p><strong>Hover:</strong> Resaltar prerrequisitos</p>
             </div>
         </div>
     `;
     
+    // Configurar botones de edición
+    setupEditButtons(code);
+    
     document.getElementById('subjectModal').style.display = 'block';
+}
+
+// Configurar botones de edición en el modal
+function setupEditButtons(code) {
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    
+    editBtn.addEventListener('click', () => {
+        toggleEditMode(true);
+    });
+    
+    saveBtn.addEventListener('click', () => {
+        saveSubjectEdits(code);
+        toggleEditMode(false);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        toggleEditMode(false);
+    });
+}
+
+// Alternar modo de edición
+function toggleEditMode(editing) {
+    const editBtn = document.getElementById('editBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    
+    const displayElements = ['description-display', 'objectives-display', 'topics-display', 'professor-display', 'schedule-display'];
+    const editElements = ['description-edit', 'objectives-edit', 'topics-edit', 'professor-edit', 'schedule-edit'];
+    
+    if (editing) {
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-block';
+        cancelBtn.style.display = 'inline-block';
+        
+        displayElements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.style.display = 'none';
+        });
+        
+        editElements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.style.display = 'block';
+        });
+    } else {
+        editBtn.style.display = 'inline-block';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+        
+        displayElements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.style.display = 'block';
+        });
+        
+        editElements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.style.display = 'none';
+        });
+    }
+}
+
+// Guardar ediciones de materia
+function saveSubjectEdits(code) {
+    const description = document.getElementById('description-input').value;
+    const objectives = document.getElementById('objectives-input').value.split('\n').filter(obj => obj.trim() !== '');
+    const topics = document.getElementById('topics-input').value.split('\n').filter(topic => topic.trim() !== '');
+    const professor = document.getElementById('professor-input').value;
+    const schedule = document.getElementById('schedule-input').value;
+    
+    // Actualizar los datos
+    if (!subjectDetails[code]) {
+        subjectDetails[code] = {};
+    }
+    
+    subjectDetails[code] = {
+        ...subjectDetails[code],
+        description: description,
+        objectives: objectives,
+        topics: topics,
+        professor: professor,
+        schedule: schedule
+    };
+    
+    // Guardar en localStorage
+    saveSubjectDetails();
+    
+    // Mostrar notificación
+    showNotification('Información actualizada correctamente', 'success');
+    
+    // Actualizar la vista
+    const subject = document.querySelector(`[data-code="${code}"]`);
+    showSubjectDetails(subject);
 }
 
 // Configurar modal
@@ -330,48 +486,17 @@ function highlightPrerequisites(subject) {
 // Limpiar resaltados
 function clearHighlights() {
     allSubjects.forEach(subject => {
-        subject.style.border = '2px solid transparent';
+        subject.style.border = '';
         subject.style.backgroundColor = '';
         subject.style.transform = '';
     });
 }
 
-// Inicializar sistema de prerrequisitos
-function initializePrerequisites() {
-    // Aquí podrías agregar lógica para verificar prerrequisitos
-    // y marcar materias como disponibles, bloqueadas, etc.
-    checkPrerequisites();
-}
+// Eliminar función obsoleta ya que ahora usamos updatePrerequisitesStatus()
+// function initializePrerequisites() - ELIMINADA
 
-// Verificar prerrequisitos (simulado para Química)
-function checkPrerequisites() {
-    // Simular materias completadas (ejemplo: estudiante en 4° semestre)
-    const completedSubjects = ['MAT01', 'QGI', 'CBI', 'PRL', 'FIS101', 'MAT03', 'ECO', 'MAT04', 'QGII', 'CBII', 'PRL2', 'QO101', 'QA1'];
-    
-    allSubjects.forEach(subject => {
-        const code = subject.getAttribute('data-code');
-        const prereq = subject.getAttribute('data-prereq');
-        
-        if (completedSubjects.includes(code)) {
-            subject.classList.add('completed');
-            subject.title = 'Materia completada ✓';
-        } else if (prereq) {
-            const prereqCodes = prereq.split(',').map(code => code.trim());
-            const prereqMet = prereqCodes.every(prereqCode => completedSubjects.includes(prereqCode));
-            
-            if (prereqMet) {
-                subject.classList.add('available');
-                subject.title = 'Materia disponible para cursar 📚';
-            } else {
-                subject.classList.add('blocked');
-                subject.title = `Prerrequisitos pendientes: ${prereq} ⚠️`;
-            }
-        } else {
-            subject.classList.add('available');
-            subject.title = 'Materia disponible para cursar 📚';
-        }
-    });
-}
+// Eliminar función obsoleta ya que ahora usamos updatePrerequisitesStatus()
+// function checkPrerequisites() - ELIMINADA
 
 // Atajos de teclado
 function handleKeyboardShortcuts(event) {
@@ -518,6 +643,262 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Estadísticas por categoría:', stats);
     }, 2000);
 });
+
+// Funciones para el sistema de materias completadas
+
+// Cargar materias completadas del localStorage
+function loadCompletedSubjects() {
+    const saved = localStorage.getItem('completedSubjects');
+    if (saved) {
+        completedSubjects = new Set(JSON.parse(saved));
+    }
+}
+
+// Guardar materias completadas en localStorage
+function saveCompletedSubjects() {
+    localStorage.setItem('completedSubjects', JSON.stringify([...completedSubjects]));
+}
+
+// Cargar detalles editados de materias del localStorage
+function loadSubjectDetails() {
+    const saved = localStorage.getItem('subjectDetails');
+    if (saved) {
+        const savedDetails = JSON.parse(saved);
+        // Combinar con los datos por defecto
+        Object.keys(savedDetails).forEach(code => {
+            if (subjectDetails[code]) {
+                subjectDetails[code] = { ...subjectDetails[code], ...savedDetails[code] };
+            }
+        });
+    }
+}
+
+// Guardar detalles editados en localStorage
+function saveSubjectDetails() {
+    localStorage.setItem('subjectDetails', JSON.stringify(subjectDetails));
+}
+
+// Alternar estado de completado de una materia
+function toggleSubjectCompletion(subject) {
+    const code = subject.getAttribute('data-code');
+    
+    if (completedSubjects.has(code)) {
+        completedSubjects.delete(code);
+        subject.classList.remove('completed');
+        showNotification(`${subject.querySelector('h3').textContent} marcada como pendiente`, 'info');
+    } else {
+        completedSubjects.add(code);
+        subject.classList.add('completed');
+        showNotification(`${subject.querySelector('h3').textContent} marcada como completada ✓`, 'success');
+    }
+    
+    saveCompletedSubjects();
+    updatePrerequisitesStatus();
+    updateStats();
+}
+
+// Actualizar estado de prerrequisitos y materias habilitadas
+function updatePrerequisitesStatus() {
+    allSubjects.forEach(subject => {
+        const code = subject.getAttribute('data-code');
+        const prereq = subject.getAttribute('data-prereq');
+        
+        // Limpiar clases previas
+        subject.classList.remove('completed', 'available', 'blocked');
+        
+        if (completedSubjects.has(code)) {
+            subject.classList.add('completed');
+            subject.title = 'Materia completada ✓';
+        } else if (prereq && prereq.trim() !== '') {
+            const prereqCodes = prereq.split(',').map(code => code.trim());
+            const prereqMet = prereqCodes.every(prereqCode => completedSubjects.has(prereqCode));
+            
+            if (prereqMet) {
+                subject.classList.add('available');
+                subject.title = 'Materia disponible para cursar 📚';
+            } else {
+                subject.classList.add('blocked');
+                const pendingPrereqs = prereqCodes.filter(prereqCode => !completedSubjects.has(prereqCode));
+                subject.title = `Prerrequisitos pendientes: ${pendingPrereqs.join(', ')} ⚠️`;
+            }
+        } else {
+            // Sin prerrequisitos
+            subject.classList.add('available');
+            subject.title = 'Materia disponible para cursar 📚';
+        }
+    });
+}
+
+// Mostrar notificación
+function showNotification(message, type = 'info') {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    // Estilos
+    Object.assign(notification.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '12px 20px',
+        borderRadius: '8px',
+        color: 'white',
+        fontWeight: '500',
+        zIndex: '10000',
+        transform: 'translateX(400px)',
+        transition: 'transform 0.3s ease',
+        maxWidth: '300px'
+    });
+    
+    // Color según tipo
+    if (type === 'success') notification.style.backgroundColor = '#27ae60';
+    else if (type === 'error') notification.style.backgroundColor = '#e74c3c';
+    else notification.style.backgroundColor = '#3498db';
+    
+    document.body.appendChild(notification);
+    
+    // Animación de entrada
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Funciones para botones de control
+
+// Configurar event listeners para botones de control
+function setupControlButtons() {
+    document.getElementById('resetBtn').addEventListener('click', resetProgress);
+    document.getElementById('exportBtn').addEventListener('click', exportProgress);
+    document.getElementById('importBtn').addEventListener('click', () => {
+        document.getElementById('importFile').click();
+    });
+    document.getElementById('importFile').addEventListener('change', importProgress);
+}
+
+// Reiniciar todo el progreso
+function resetProgress() {
+    if (confirm('¿Estás seguro de que quieres reiniciar todo tu progreso? Esta acción no se puede deshacer.')) {
+        completedSubjects.clear();
+        localStorage.removeItem('completedSubjects');
+        localStorage.removeItem('subjectDetails');
+        
+        // Recargar datos por defecto
+        location.reload();
+        
+        showNotification('Progreso reiniciado correctamente', 'info');
+    }
+}
+
+// Exportar progreso a archivo JSON
+function exportProgress() {
+    const data = {
+        completedSubjects: [...completedSubjects],
+        subjectDetails: subjectDetails,
+        exportDate: new Date().toISOString(),
+        version: '1.0'
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `malla-curricular-quimica-progreso-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Progreso exportado correctamente', 'success');
+}
+
+// Importar progreso desde archivo JSON
+function importProgress(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            if (data.completedSubjects && Array.isArray(data.completedSubjects)) {
+                completedSubjects = new Set(data.completedSubjects);
+                saveCompletedSubjects();
+            }
+            
+            if (data.subjectDetails && typeof data.subjectDetails === 'object') {
+                Object.keys(data.subjectDetails).forEach(code => {
+                    if (subjectDetails[code]) {
+                        subjectDetails[code] = { ...subjectDetails[code], ...data.subjectDetails[code] };
+                    }
+                });
+                saveSubjectDetails();
+            }
+            
+            updatePrerequisitesStatus();
+            updateStats();
+            
+            showNotification(`Progreso importado correctamente (${data.exportDate ? new Date(data.exportDate).toLocaleDateString() : 'fecha desconocida'})`, 'success');
+        } catch (error) {
+            showNotification('Error al importar el archivo. Verifica que sea un archivo válido.', 'error');
+        }
+    };
+    
+    reader.readAsText(file);
+    
+    // Limpiar el input
+    event.target.value = '';
+}
+
+// Función para obtener estadísticas del progreso
+function getProgressStats() {
+    const totalSubjects = allSubjects.length;
+    const completedCount = completedSubjects.size;
+    const availableCount = allSubjects.filter(subject => {
+        const code = subject.getAttribute('data-code');
+        const prereq = subject.getAttribute('data-prereq');
+        
+        if (completedSubjects.has(code)) return false;
+        
+        if (!prereq || prereq.trim() === '') return true;
+        
+        const prereqCodes = prereq.split(',').map(code => code.trim());
+        return prereqCodes.every(prereqCode => completedSubjects.has(prereqCode));
+    }).length;
+    
+    const blockedCount = totalSubjects - completedCount - availableCount;
+    
+    const totalCredits = allSubjects.reduce((sum, subject) => {
+        return sum + parseInt(subject.getAttribute('data-credits') || 0);
+    }, 0);
+    
+    const completedCredits = [...completedSubjects].reduce((sum, code) => {
+        const subject = allSubjects.find(s => s.getAttribute('data-code') === code);
+        return sum + (subject ? parseInt(subject.getAttribute('data-credits') || 0) : 0);
+    }, 0);
+    
+    return {
+        totalSubjects,
+        completedCount,
+        availableCount,
+        blockedCount,
+        totalCredits,
+        completedCredits,
+        progressPercentage: Math.round((completedCount / totalSubjects) * 100)
+    };
+}
 
 // Hacer algunas funciones globales para uso en consola
 window.mallaCurricular = {
