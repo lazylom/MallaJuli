@@ -42,13 +42,19 @@
                 </div>
                 
                 <div class="control-buttons">
+                    <button id="editModeBtn" class="control-btn edit-btn" title="Activar modo edición">
+                        <i class="fas fa-edit"></i> Editar Malla
+                    </button>
+                    <button id="addSubjectBtn" class="control-btn add-btn" title="Agregar nueva materia" style="display: none;">
+                        <i class="fas fa-plus"></i> Agregar Materia
+                    </button>
                     <button id="resetBtn" class="control-btn reset-btn" title="Reiniciar progreso">
                         <i class="fas fa-undo"></i> Reiniciar
                     </button>
-                    <button id="exportBtn" class="control-btn export-btn" title="Exportar progreso">
+                    <button id="exportBtn" class="control-btn export-btn" title="Exportar malla">
                         <i class="fas fa-download"></i> Exportar
                     </button>
-                    <button id="importBtn" class="control-btn import-btn" title="Importar progreso">
+                    <button id="importBtn" class="control-btn import-btn" title="Importar malla">
                         <i class="fas fa-upload"></i> Importar
                     </button>
                     <input type="file" id="importFile" accept=".json" style="display: none;">
@@ -440,6 +446,84 @@
         <!-- Modal para detalles de materia -->
         <div id="subjectModal" class="modal">
             <!-- El contenido se genera dinámicamente -->
+        </div>
+
+        <!-- Modal para crear/editar materia -->
+        <div id="editSubjectModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close" id="closeEditModal">&times;</span>
+                    <h2 id="editModalTitle">Crear Nueva Materia</h2>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="subjectForm">
+                        <div class="form-group">
+                            <label for="subjectName">Nombre de la materia:</label>
+                            <input type="text" id="subjectName" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subjectCode">Código:</label>
+                            <input type="text" id="subjectCode" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subjectCredits">Créditos:</label>
+                            <input type="number" id="subjectCredits" min="1" max="30" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subjectSemester">Semestre:</label>
+                            <select id="subjectSemester" required>
+                                <option value="">Seleccionar semestre</option>
+                                <option value="1">1° Semestre</option>
+                                <option value="2">2° Semestre</option>
+                                <option value="3">3° Semestre</option>
+                                <option value="4">4° Semestre</option>
+                                <option value="5">5° Semestre</option>
+                                <option value="6">6° Semestre</option>
+                                <option value="7">7° Semestre</option>
+                                <option value="8">8° Semestre</option>
+                                <option value="9">9° Semestre</option>
+                                <option value="10">10° Semestre</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subjectCategory">Categoría:</label>
+                            <select id="subjectCategory" required>
+                                <option value="basic">Ciencias Básicas</option>
+                                <option value="professional">Química Fundamental</option>
+                                <option value="specialization">Especialización</option>
+                                <option value="elective">Práctica Profesional</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subjectPrereq">Prerrequisitos (códigos separados por coma):</label>
+                            <input type="text" id="subjectPrereq" placeholder="Ej: MAT01, QGI">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subjectDescription">Descripción:</label>
+                            <textarea id="subjectDescription" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Materia
+                            </button>
+                            <button type="button" id="cancelEditBtn" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                            <button type="button" id="deleteSubjectBtn" class="btn btn-danger" style="display: none;">
+                                <i class="fas fa-trash"></i> Eliminar Materia
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <footer class="footer">

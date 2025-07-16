@@ -1207,3 +1207,189 @@ body.modal-open {
     max-width: 100%;
     box-sizing: border-box;
 }
+
+/* ==============================================
+   MODO EDICIÓN DE MALLA CURRICULAR
+   ============================================== */
+
+/* Indicador de modo edición */
+body.edit-mode {
+    background: linear-gradient(45deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.02) 100%);
+}
+
+body.edit-mode .header {
+    border: 2px solid var(--warning-color);
+    position: relative;
+}
+
+body.edit-mode .header::before {
+    content: '🔧 MODO EDICIÓN ACTIVO';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--warning-color);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 10;
+}
+
+/* Estilos para botones de edición */
+.control-btn.edit-btn {
+    background: var(--warning-color);
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+.control-btn.edit-btn:hover {
+    background: #e0a800;
+}
+
+.control-btn.add-btn {
+    background: var(--success-color);
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+.control-btn.add-btn:hover {
+    background: #218838;
+}
+
+/* Estilos para materias en modo edición */
+body.edit-mode .subject {
+    position: relative;
+    border: 2px dashed transparent;
+    transition: all 0.3s ease;
+}
+
+body.edit-mode .subject:hover {
+    border-color: var(--warning-color);
+    background: rgba(255, 193, 7, 0.1);
+}
+
+body.edit-mode .subject::after {
+    content: '✏️';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--warning-color);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+body.edit-mode .subject:hover::after {
+    opacity: 1;
+}
+
+/* Formulario de edición de materias */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn.btn-danger {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+}
+
+.btn.btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Responsive para formularios */
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    body.edit-mode .header::before {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+    }
+    
+    /* Ajustar grid de botones en modo edición */
+    body.edit-mode .control-buttons {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    body.edit-mode .control-btn {
+        grid-column: auto;
+    }
+}
+
+/* Estados de validación */
+.form-group input:invalid,
+.form-group select:invalid {
+    border-color: var(--accent-color);
+}
+
+.form-group input:valid,
+.form-group select:valid {
+    border-color: var(--success-color);
+}
+
+/* Tooltip para ayuda */
+.form-group .help-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    font-style: italic;
+}

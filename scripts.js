@@ -942,6 +942,652 @@ function getProgressStats() {
     };
 }
 
+// ==============================================
+// MODO EDICIÓN DE MALLA CURRICULAR
+// ==============================================
+
+// Variables para modo edición
+let isEditMode = false;
+let mallaData = {}; // Almacenar estructura de la malla
+
+// Inicializar sistema de edición
+function initializeEditMode() {
+    loadMallaData();
+    setupEditModeEvents();
+}
+
+// Cargar datos de la malla desde localStorage o crear estructura inicial
+function loadMallaData() {
+    const saved = localStorage.getItem('mallaData');
+    if (saved) {
+        mallaData = JSON.parse(saved);
+    } else {
+        // Extraer datos actuales del DOM
+        extractMallaFromDOM();
+    }
+}
+
+// Extraer estructura de malla del DOM actual
+function extractMallaFromDOM() {
+    mallaData = { subjects: {}, semesters: {} };
+    
+    // Extraer materias existentes
+    allSubjects.forEach(subject => {
+        const code = subject.getAttribute('data-code');
+        const name = subject.querySelector('h3').textContent;
+        const credits = parseInt(subject.getAttribute('data-credits'));
+        const prereq = subject.getAttribute('data-prereq') || '';
+        const category = getSubjectCategory(subject);
+        const semester = getSemesterNumber(subject);
+        
+        mallaData.subjects[code] = {
+            name,
+            code,
+            credits,
+            prereq,
+            category,
+            semester,
+            description: subjectDetails[code]?.description || '',
+            objectives: subjectDetails[code]?.objectives || [],
+            topics: subjectDetails[code]?.topics || [],
+            professor: subjectDetails[code]?.professor || '',
+            schedule: subjectDetails[code]?.schedule || ''
+        };
+    });
+    
+    // Extraer estructura de semestres
+    for (let i = 1; i <= 10; i++) {
+        mallaData.semesters[i] = {
+            number: i,
+            title: `${i}° Semestre`,
+            subjects: Object.keys(mallaData.subjects).filter(code => 
+                mallaData.subjects[code].semester === i
+            )
+        };
+    }
+    
+    saveMallaData();
+}
+
+// Obtener categoría de materia del DOM
+function getSubjectCategory(subject) {
+    if (subject.classList.contains('basic')) return 'basic';
+    if (subject.classList.contains('professional')) return 'professional';
+    if (subject.classList.contains('specialization')) return 'specialization';
+    if (subject.classList.contains('elective')) return 'elective';
+    return 'basic';
+}
+
+// Obtener número de semestre del DOM
+function getSemesterNumber(subject) {
+    const semester = subject.closest('.semester');
+    const semesterTitle = semester.querySelector('.semester-title').textContent;
+    const match = semesterTitle.match(/(\d+)/);
+    return match ? parseInt(match[1]) : 1;
+}
+
+// Guardar datos de malla en localStorage
+function saveMallaData() {
+    localStorage.setItem('mallaData', JSON.stringify(mallaData));
+}
+
+// Configurar eventos para modo edición
+function setupEditModeEvents() {
+    document.getElementById('editModeBtn').addEventListener('click', toggleEditMode);
+    document.getElementById('addSubjectBtn').addEventListener('click', showCreateSubjectModal);
+    
+    // Modal de edición de materias
+    setupEditSubjectModal();
+}
+
+// Alternar modo edición
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const editBtn = document.getElementById('editModeBtn');
+    const addBtn = document.getElementById('addSubjectBtn');
+    
+    if (isEditMode) {
+        document.body.classList.add('edit-mode');
+        editBtn.innerHTML = '<i class="fas fa-eye"></i> Modo Vista';
+        editBtn.title = 'Salir del modo edición';
+        addBtn.style.display = 'block';
+        
+        // Agregar eventos de edición a materias existentes
+        addEditEventListeners();
+        showNotification('Modo edición activado. Click en las materias para editarlas', 'info');
+    } else {
+        document.body.classList.remove('edit-mode');
+        editBtn.innerHTML = '<i class="fas fa-edit"></i> Editar Malla';
+        editBtn.title = 'Activar modo edición';
+        addBtn.style.display = 'none';
+        
+        // Remover eventos de edición
+        removeEditEventListeners();
+        showNotification('Modo vista activado', 'info');
+    }
+}
+
+// Agregar eventos de edición a materias
+function addEditEventListeners() {
+    allSubjects.forEach(subject => {
+        // Remover eventos normales temporalmente
+        const newSubject = subject.cloneNode(true);
+        subject.parentNode.replaceChild(newSubject, subject);
+        
+        // Agregar evento de edición
+        newSubject.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            showEditSubjectModal(newSubject);
+        });
+    });
+    
+    // Actualizar referencia a allSubjects
+    allSubjects = Array.from(document.querySelectorAll('.subject'));
+}
+
+// Remover eventos de edición
+function removeEditEventListeners() {
+    // Recargar eventos normales
+    loadSubjects();
+}
+
+// Configurar modal de edición de materias
+function setupEditSubjectModal() {
+    const modal = document.getElementById('editSubjectModal');
+    const closeBtn = document.getElementById('closeEditModal');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const deleteBtn = document.getElementById('deleteSubjectBtn');
+    const form = document.getElementById('subjectForm');
+    
+    // Cerrar modal
+    const closeModal = () => {
+        modal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        clearForm();
+    };
+    
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+    
+    // Cerrar al hacer click fuera
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    
+    // Guardar materia
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveSubjectFromForm();
+        closeModal();
+    });
+    
+    // Eliminar materia
+    deleteBtn.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres eliminar esta materia?')) {
+            deleteCurrentSubject();
+            closeModal();
+        }
+    });
+}
+
+// Mostrar modal para crear nueva materia
+function showCreateSubjectModal() {
+    const modal = document.getElementById('editSubjectModal');
+    const title = document.getElementById('editModalTitle');
+    const deleteBtn = document.getElementById('deleteSubjectBtn');
+    
+    title.textContent = 'Crear Nueva Materia';
+    deleteBtn.style.display = 'none';
+    clearForm();
+    
+    // Establecer valores por defecto
+    document.getElementById('subjectSemester').value = '1';
+    document.getElementById('subjectCategory').value = 'basic';
+    
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    
+    // Focus en primer campo
+    document.getElementById('subjectName').focus();
+}
+
+// Mostrar modal para editar materia existente
+function showEditSubjectModal(subject) {
+    const modal = document.getElementById('editSubjectModal');
+    const title = document.getElementById('editModalTitle');
+    const deleteBtn = document.getElementById('deleteSubjectBtn');
+    
+    const code = subject.getAttribute('data-code');
+    const subjectData = mallaData.subjects[code];
+    
+    title.textContent = 'Editar Materia';
+    deleteBtn.style.display = 'block';
+    
+    // Llenar formulario con datos existentes
+    document.getElementById('subjectName').value = subjectData.name;
+    document.getElementById('subjectCode').value = subjectData.code;
+    document.getElementById('subjectCredits').value = subjectData.credits;
+    document.getElementById('subjectSemester').value = subjectData.semester;
+    document.getElementById('subjectCategory').value = subjectData.category;
+    document.getElementById('subjectPrereq').value = subjectData.prereq;
+    document.getElementById('subjectDescription').value = subjectData.description;
+    
+    // Guardar referencia para edición
+    modal.dataset.editingCode = code;
+    
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+}
+
+// Limpiar formulario
+function clearForm() {
+    document.getElementById('subjectForm').reset();
+    document.getElementById('editSubjectModal').removeAttribute('data-editing-code');
+}
+
+// Guardar materia desde formulario
+function saveSubjectFromForm() {
+    const modal = document.getElementById('editSubjectModal');
+    const isEditing = modal.hasAttribute('data-editing-code');
+    const editingCode = modal.getAttribute('data-editing-code');
+    
+    const formData = {
+        name: document.getElementById('subjectName').value.trim(),
+        code: document.getElementById('subjectCode').value.trim().toUpperCase(),
+        credits: parseInt(document.getElementById('subjectCredits').value),
+        semester: parseInt(document.getElementById('subjectSemester').value),
+        category: document.getElementById('subjectCategory').value,
+        prereq: document.getElementById('subjectPrereq').value.trim(),
+        description: document.getElementById('subjectDescription').value.trim()
+    };
+    
+    // Validaciones
+    if (!formData.name || !formData.code) {
+        showNotification('Nombre y código son obligatorios', 'error');
+        return;
+    }
+    
+    // Verificar código único (excepto si estamos editando la misma materia)
+    if (!isEditing || editingCode !== formData.code) {
+        if (mallaData.subjects[formData.code]) {
+            showNotification('Ya existe una materia con ese código', 'error');
+            return;
+        }
+    }
+    
+    if (isEditing) {
+        // Editar materia existente
+        updateSubject(editingCode, formData);
+    } else {
+        // Crear nueva materia
+        createSubject(formData);
+    }
+}
+
+// Crear nueva materia
+function createSubject(data) {
+    // Agregar a mallaData
+    mallaData.subjects[data.code] = {
+        ...data,
+        objectives: [],
+        topics: [],
+        professor: '',
+        schedule: ''
+    };
+    
+    // Agregar a semestre correspondiente
+    if (!mallaData.semesters[data.semester].subjects.includes(data.code)) {
+        mallaData.semesters[data.semester].subjects.push(data.code);
+    }
+    
+    // Crear elemento DOM
+    createSubjectElement(data);
+    
+    // Guardar y actualizar
+    saveMallaData();
+    saveSubjectDetails();
+    updateAllSubjects();
+    
+    showNotification(`Materia "${data.name}" creada correctamente`, 'success');
+}
+
+// Actualizar materia existente
+function updateSubject(oldCode, newData) {
+    const oldData = mallaData.subjects[oldCode];
+    const oldSemester = oldData.semester;
+    
+    // Si cambió el código, actualizar referencias
+    if (oldCode !== newData.code) {
+        // Remover código anterior
+        delete mallaData.subjects[oldCode];
+        
+        // Actualizar prerrequisitos que referencien el código anterior
+        Object.keys(mallaData.subjects).forEach(code => {
+            const subject = mallaData.subjects[code];
+            if (subject.prereq.includes(oldCode)) {
+                subject.prereq = subject.prereq.replace(oldCode, newData.code);
+            }
+        });
+        
+        // Remover de semestre anterior
+        mallaData.semesters[oldSemester].subjects = 
+            mallaData.semesters[oldSemester].subjects.filter(code => code !== oldCode);
+    }
+    
+    // Actualizar datos
+    mallaData.subjects[newData.code] = {
+        ...oldData,
+        ...newData
+    };
+    
+    // Si cambió de semestre, mover entre semestres
+    if (oldSemester !== newData.semester) {
+        if (oldCode === newData.code) {
+            mallaData.semesters[oldSemester].subjects = 
+                mallaData.semesters[oldSemester].subjects.filter(code => code !== oldCode);
+        }
+        
+        if (!mallaData.semesters[newData.semester].subjects.includes(newData.code)) {
+            mallaData.semesters[newData.semester].subjects.push(newData.code);
+        }
+    }
+    
+    // Actualizar subjectDetails para modal de detalles
+    subjectDetails[newData.code] = {
+        name: newData.name,
+        description: newData.description,
+        objectives: oldData.objectives || [],
+        topics: oldData.topics || [],
+        professor: oldData.professor || '',
+        schedule: oldData.schedule || ''
+    };
+    
+    // Actualizar completedSubjects si el código cambió
+    if (oldCode !== newData.code && completedSubjects.has(oldCode)) {
+        completedSubjects.delete(oldCode);
+        completedSubjects.add(newData.code);
+        saveCompletedSubjects();
+    }
+    
+    // Recrear estructura DOM
+    recreateCurriculum();
+    
+    showNotification(`Materia "${newData.name}" actualizada correctamente`, 'success');
+}
+
+// Eliminar materia actual
+function deleteCurrentSubject() {
+    const modal = document.getElementById('editSubjectModal');
+    const code = modal.getAttribute('data-editing-code');
+    
+    if (!code) return;
+    
+    const subjectData = mallaData.subjects[code];
+    
+    // Verificar si hay materias que dependen de esta
+    const dependentSubjects = Object.keys(mallaData.subjects).filter(subjCode => {
+        const subject = mallaData.subjects[subjCode];
+        return subject.prereq.includes(code);
+    });
+    
+    if (dependentSubjects.length > 0) {
+        const dependentNames = dependentSubjects.map(subjCode => mallaData.subjects[subjCode].name);
+        showNotification(`No se puede eliminar: las siguientes materias dependen de esta: ${dependentNames.join(', ')}`, 'error');
+        return;
+    }
+    
+    // Eliminar de mallaData
+    delete mallaData.subjects[code];
+    
+    // Remover de semestre
+    mallaData.semesters[subjectData.semester].subjects = 
+        mallaData.semesters[subjectData.semester].subjects.filter(subjCode => subjCode !== code);
+    
+    // Remover de completedSubjects
+    if (completedSubjects.has(code)) {
+        completedSubjects.delete(code);
+        saveCompletedSubjects();
+    }
+    
+    // Remover de subjectDetails
+    delete subjectDetails[code];
+    
+    // Recrear DOM
+    recreateCurriculum();
+    
+    showNotification(`Materia "${subjectData.name}" eliminada correctamente`, 'success');
+}
+
+// Crear elemento DOM para nueva materia
+function createSubjectElement(data) {
+    const semester = document.querySelector(`.semester:nth-child(${data.semester})`);
+    if (!semester) return;
+    
+    const subjectsContainer = semester.querySelector('.subjects');
+    
+    const subjectElement = document.createElement('div');
+    subjectElement.className = `subject ${data.category}`;
+    subjectElement.setAttribute('data-credits', data.credits);
+    subjectElement.setAttribute('data-code', data.code);
+    subjectElement.setAttribute('data-prereq', data.prereq);
+    
+    subjectElement.innerHTML = `
+        <h3>${data.name}</h3>
+        <p class="credits">${data.credits} créditos</p>
+        <p class="code">${data.code}</p>
+        ${data.prereq ? `<p class="prereq">Pre: ${data.prereq}</p>` : ''}
+    `;
+    
+    subjectsContainer.appendChild(subjectElement);
+}
+
+// Recrear toda la estructura del curriculum
+function recreateCurriculum() {
+    const curriculumGrid = document.getElementById('curriculumGrid');
+    curriculumGrid.innerHTML = '';
+    
+    // Recrear semestres
+    for (let i = 1; i <= 10; i++) {
+        const semesterData = mallaData.semesters[i];
+        if (semesterData.subjects.length === 0) continue; // Saltar semestres vacíos
+        
+        const semesterElement = document.createElement('div');
+        semesterElement.className = 'semester';
+        
+        const semesterTitle = document.createElement('h2');
+        semesterTitle.className = 'semester-title';
+        semesterTitle.textContent = semesterData.title;
+        
+        const subjectsContainer = document.createElement('div');
+        subjectsContainer.className = 'subjects';
+        
+        // Agregar materias del semestre
+        semesterData.subjects.forEach(code => {
+            const subjectData = mallaData.subjects[code];
+            if (!subjectData) return;
+            
+            const subjectElement = document.createElement('div');
+            subjectElement.className = `subject ${subjectData.category}`;
+            subjectElement.setAttribute('data-credits', subjectData.credits);
+            subjectElement.setAttribute('data-code', subjectData.code);
+            subjectElement.setAttribute('data-prereq', subjectData.prereq);
+            
+            subjectElement.innerHTML = `
+                <h3>${subjectData.name}</h3>
+                <p class="credits">${subjectData.credits} créditos</p>
+                <p class="code">${subjectData.code}</p>
+                ${subjectData.prereq ? `<p class="prereq">Pre: ${subjectData.prereq}</p>` : ''}
+            `;
+            
+            subjectsContainer.appendChild(subjectElement);
+        });
+        
+        semesterElement.appendChild(semesterTitle);
+        semesterElement.appendChild(subjectsContainer);
+        curriculumGrid.appendChild(semesterElement);
+    }
+    
+    // Actualizar referencias y eventos
+    updateAllSubjects();
+}
+
+// Actualizar todas las referencias después de cambios
+function updateAllSubjects() {
+    allSubjects = Array.from(document.querySelectorAll('.subject'));
+    
+    // Reconfigurar eventos según el modo actual
+    if (isEditMode) {
+        addEditEventListeners();
+    } else {
+        loadSubjects();
+    }
+    
+    // Actualizar estados
+    updatePrerequisitesStatus();
+    updateStats();
+    saveMallaData();
+    saveSubjectDetails();
+}
+
+// Exportar malla completa (estructura + progreso)
+function exportFullMalla() {
+    const data = {
+        mallaData: mallaData,
+        completedSubjects: [...completedSubjects],
+        subjectDetails: subjectDetails,
+        exportDate: new Date().toISOString(),
+        version: '2.0',
+        type: 'full-malla'
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `malla-curricular-completa-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Malla completa exportada correctamente', 'success');
+}
+
+// Importar malla completa
+function importFullMalla(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            if (data.type === 'full-malla' && data.mallaData) {
+                // Confirmar importación
+                if (!confirm('Esto reemplazará completamente tu malla actual. ¿Continuar?')) {
+                    return;
+                }
+                
+                // Importar estructura de malla
+                mallaData = data.mallaData;
+                saveMallaData();
+                
+                // Importar progreso si existe
+                if (data.completedSubjects) {
+                    completedSubjects = new Set(data.completedSubjects);
+                    saveCompletedSubjects();
+                }
+                
+                // Importar detalles si existen
+                if (data.subjectDetails) {
+                    subjectDetails = data.subjectDetails;
+                    saveSubjectDetails();
+                }
+                
+                // Recrear interfaz
+                recreateCurriculum();
+                
+                showNotification('Malla completa importada correctamente', 'success');
+            } else {
+                // Intentar importar como progreso solamente
+                importProgress({ target: { files: [file] } });
+            }
+        } catch (error) {
+            showNotification('Error al importar el archivo', 'error');
+        }
+    };
+    
+    reader.readAsText(file);
+}
+
+// Modificar función de importación existente para manejar ambos tipos
+const originalImportProgress = importProgress;
+importProgress = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            if (data.type === 'full-malla') {
+                importFullMalla(file);
+            } else {
+                // Usar función original para progreso
+                originalImportProgress(event);
+            }
+        } catch (error) {
+            showNotification('Error al leer el archivo', 'error');
+        }
+    };
+    
+    reader.readAsText(file);
+    event.target.value = '';
+};
+
+// Actualizar función de exportación para incluir opción de malla completa
+const originalExportProgress = exportProgress;
+exportProgress = function() {
+    if (isEditMode) {
+        if (confirm('¿Quieres exportar solo el progreso o la malla completa (estructura + progreso)?')) {
+            exportFullMalla();
+        } else {
+            originalExportProgress();
+        }
+    } else {
+        originalExportProgress();
+    }
+};
+
+// Inicializar modo edición cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar a que se inicialice la app principal
+    setTimeout(() => {
+        initializeEditMode();
+    }, 100);
+});
+
+// Actualizar función de reset para incluir malla
+const originalResetProgress = resetProgress;
+resetProgress = function() {
+    const message = isEditMode ? 
+        '¿Estás seguro de que quieres reiniciar todo (estructura de malla + progreso)? Esta acción no se puede deshacer.' :
+        '¿Estás seguro de que quieres reiniciar todo tu progreso? Esta acción no se puede deshacer.';
+    
+    if (confirm(message)) {
+        completedSubjects.clear();
+        localStorage.removeItem('completedSubjects');
+        localStorage.removeItem('subjectDetails');
+        
+        if (isEditMode) {
+            localStorage.removeItem('mallaData');
+        }
+        
+        location.reload();
+    }
+};
+
 // Hacer algunas funciones globales para uso en consola
 window.mallaCurricular = {
     exportData: exportCurriculumData,
